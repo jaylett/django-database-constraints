@@ -109,7 +109,9 @@ Or just this:
 
 The same works with `UpdateView`. If you bring in `django_database_constraints.forms.TransactionalMixin` to your forms then you get `.tsave()` on them which does all the conversion and adding `ValidationError` as a form error stuff; this method will be called in preference by the `TransactionalModelFormMixin` so you can override its behaviour if you really need to.
 
-If you want to provide custom code to convert from an `IntegrityError` to a `ValidationError` then override `.validationerror_from_integrityerror()` on your form processing view (the one that has `TransactionalModelFormMixin`). Note that right now you specify the form field by dropping a `for_form_field` attribute on the `ValidationError`; there's work ongoing in Django that will hopefully come up with a better overall approach to this.
+If you want to provide custom code to convert from an `IntegrityError` to a `ValidationError` then override `.validationerror_from_integrityerror()` on your form processing view (the one that has `TransactionalModelFormMixin`). Note that to create a `ValidationError` for a particular field you construct it with a dictionary:
+
+    raise ValidationError({ 'fieldname': 'validation message'})
 
 ## Future work
 

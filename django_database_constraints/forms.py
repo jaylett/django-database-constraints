@@ -1,5 +1,6 @@
-from django.db import transaction, IntegrityError
 from django import forms
+from django.db import transaction, IntegrityError
+from django.utils.encoding import force_text
 
 
 def fallback_conversion(ierror):
@@ -37,8 +38,16 @@ def transactional_save(form, convertors=None):
         except IntegrityError as e:
             raise validationerror_from_integrityerror(e, convertors)
     except forms.ValidationError as e:
-        for message in e.messages:
-            add_error_to_form(form, message, getattr(e, 'for_form_field', None))
+        error_dict = e.update_error_dict({})
+        for field, messages in error_dict.items():
+            message_list = []
+            for message in messages:
+                if isinstance(message, forms.ValidationError):
+                    message_list.extend(message.messages)
+                else:
+                    message_list.append(force_text(message))
+            for m in message_list:
+                add_error_to_form(form, m, field)
         raise
 
 
