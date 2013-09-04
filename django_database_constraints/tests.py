@@ -194,7 +194,7 @@ class TestTransactionalSave(TransactionTestCase):
         self.assertEqual(2, len(form.non_field_errors()))
         self.assertEqual({"some message", "some other message"}, set(form.non_field_errors()))
 
-    def test_form_raises_validationerror_list(self):
+    def test_form_raises_validationerror_dict(self):
         class InnerTestForm(TransactionalTestForm):
             def save(self):
                 raise django.forms.ValidationError(
