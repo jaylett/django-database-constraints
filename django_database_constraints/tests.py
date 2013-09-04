@@ -166,6 +166,53 @@ class TestTransactionalSave(TransactionTestCase):
     # this is very similar to the concurrency tests above, but trying
     # to get better behaviour
 
+    def test_form_raises_validationerror(self):
+        class InnerTestForm(TransactionalTestForm):
+            def save(self):
+                raise django.forms.ValidationError("some message")
+
+        form = InnerTestForm({ 'unique': 1})
+        form.is_valid()
+        try:
+            form.tsave()
+        except django.forms.ValidationError as e:
+            pass
+        self.assertEqual(1, len(form.non_field_errors()))
+        self.assertEqual("some message", form.non_field_errors()[0])
+
+    def test_form_raises_validationerror_list(self):
+        class InnerTestForm(TransactionalTestForm):
+            def save(self):
+                raise django.forms.ValidationError(["some message", "some other message"])
+
+        form = InnerTestForm({ 'unique': 1})
+        form.is_valid()
+        try:
+            form.tsave()
+        except django.forms.ValidationError as e:
+            pass
+        self.assertEqual(2, len(form.non_field_errors()))
+        self.assertEqual({"some message", "some other message"}, set(form.non_field_errors()))
+
+    def test_form_raises_validationerror_list(self):
+        class InnerTestForm(TransactionalTestForm):
+            def save(self):
+                raise django.forms.ValidationError(
+                    {
+                        "unique": ["some message", "some other message"]
+                    }
+                )
+
+        form = InnerTestForm({ 'unique': 1})
+        form.is_valid()
+        try:
+            form.tsave()
+        except django.forms.ValidationError as e:
+            pass
+        field_errors = form.errors.get("unique")
+        self.assertEqual(2, len(field_errors))
+        self.assertEqual({"some message", "some other message"}, set(field_errors))
+
     def test_with_transactions(self):
         self.assertEqual(0, TestModel.objects.count())
 
