@@ -113,6 +113,40 @@ If you want to provide custom code to convert from an `IntegrityError` to a `Val
 
     raise ValidationError({ 'fieldname': ['validation message']})
 
+## Managing the database transaction
+
+There's a `tx_context_manager` parameter to `transactional_save`, which is intended to allow use with `django-ballads`, another of my extensions which allows you to register compensating transactions to clean up non-database operations (eg external payment processing) on transaction rollback. (In theory you could come up with your own context manager instead, which might be useful in some very specific situations.)
+
+Consider a `Form` which you want to work with database-level constraints (perhaps a unique email address on account creation) and external services (say, charging via an external payment provider). You want to do something like this:
+
+    class CreateForm(forms.Form):
+        email = EmailField()
+        # ... other fields
+
+        def tsave(self, convertors=None):
+            self.ballad = Ballad()
+            return transactional_save(self, convertors, self.ballad)
+
+        def save(self):
+            # Note that this runs inside the ballad (which itself contains
+            # a database transaction using `transaction.atomic`). This is
+            # better than declaring a ballad in this method because you
+            # won't necessarily get every possible `IntegrityError` out
+            # of the database until the outer transaction is committed, so
+            # you could leak a charge.
+            user = User.objects.create(
+                email = self.cleaned_data['email'],
+                # ... other fields
+            )
+            charge = external_provider.Charge.create(
+                # payment fields
+            )
+            self.ballad.compensation(lambda: charge.refund())
+            # maybe also subscribe to mailing lists &c
+            return user
+
+Remember that in a ballad, the database transaction is rolled back before any of the compensating transactions are run.
+
 ## Future work
 
 It should be possible to automatically ascribe the vast majority of integrity failures to specific fields both for mysql and postgresql. Getting helpful error messages is going to be hard in the general case.

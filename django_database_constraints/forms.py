@@ -31,10 +31,15 @@ def add_error_to_form(form, error, field=None):
     form._errors[field].append(error)
 
 
-def transactional_save(form, convertors=None):
+def transactional_save(form, convertors=None, tx_context_manager=None):
+    # tx_context_manager must be equivalent to transaction.atomic();
+    # its main purpose here is to allow the use of django-ballads so
+    # you can register compensating transactions for external services.
+    if tx_context_manager is None:
+        tx_context_manager = transaction.atomic()
     try:
         try:
-            with transaction.atomic():
+            with tx_context_manager:
                 # all "transactional" saves commit at once
                 return form.save()
         except IntegrityError as e:
