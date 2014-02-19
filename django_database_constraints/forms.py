@@ -21,6 +21,8 @@ def validationerror_from_integrityerror(ierror, convertors=None):
             return v
 
 
+# FIXME: in Django 1.7 something like this is available
+# as part of the core API.
 def add_error_to_form(form, error, field=None):
     if field is None: #pragma no cover
         # because it's not called the way we do things right now
