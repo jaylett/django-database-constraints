@@ -111,7 +111,7 @@ The same works with `UpdateView`. If you bring in `django_database_constraints.f
 
 If you want to provide custom code to convert from an `IntegrityError` to a `ValidationError` then override `.validationerror_from_integrityerror()` on your form processing view (the one that has `TransactionalModelFormMixin`). Note that to create a `ValidationError` for a particular field you construct it with a dictionary:
 
-    raise ValidationError({ 'fieldname': 'validation message'})
+    raise ValidationError({ 'fieldname': ['validation message']})
 
 ## Future work
 
