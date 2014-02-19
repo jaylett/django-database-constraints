@@ -165,7 +165,7 @@ You want the following to be able to work on the code and run the tests:
 
     $ pip install Django>=1.6.0 coverage psycopg2 MySQL-python
 
-Note that if you use the official distributions of MySQL on Mac OS you want to run this with `PATH=$PATH:/usr/local/mysql/bin` and run `make coverage` with DYLD_LIBRARY_PATH=/usr/local/mysql/lib`. (Use `Postgresql.app` for convenience.)
+Note that if you use the official distributions of MySQL on Mac OS you want to run this with `PATH=$PATH:/usr/local/mysql/bin` and run `make coverage` with `DYLD_LIBRARY_PATH=/usr/local/mysql/lib`. (Use `Postgresql.app` for convenience.)
 
 ## License
 
