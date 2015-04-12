@@ -21,16 +21,9 @@ def validationerror_from_integrityerror(ierror, convertors=None):
             return v
 
 
-# FIXME: in Django 1.7 something like this is available
-# as part of the core API.
+# Kept indirected in case anyone was using this directly.
 def add_error_to_form(form, error, field=None):
-    if field is None: #pragma no cover
-        # because it's not called the way we do things right now
-        # and Django should get an official API for this at some point
-        field = forms.forms.NON_FIELD_ERRORS
-    if field not in form._errors:
-        form._errors[field] = form.error_class()
-    form._errors[field].append(error)
+    form.add_error(field, error)
 
 
 def transactional_save(form, convertors=None, tx_context_manager=None):

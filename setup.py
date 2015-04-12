@@ -5,7 +5,7 @@ except ImportError:
     from distutils.core import setup
 
 PACKAGE = 'django_database_constraints'
-VERSION = '0.2'
+VERSION = '0.3'
 
 setup(
     name=PACKAGE, version=VERSION,
@@ -17,7 +17,7 @@ setup(
     author='James Aylett',
     author_email='james@tartarus.org',
     install_requires=[
-        'Django>=1.6.0',
+        'Django>=1.7.7',
     ],
     url = 'https://github.com/jaylett/django-database-constraints',
     classifiers = [
