@@ -1,7 +1,7 @@
 import django.forms
 from django.views.generic.edit import CreateView as _CreateView, UpdateView as _UpdateView
 
-from forms import transactional_save
+from .forms import transactional_save
 
 
 class TransactionalModelFormMixin(object):

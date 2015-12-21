@@ -1,6 +1,7 @@
 import os.path
 import subprocess
 import sys
+import django
 from django.conf import settings
 
 DATABASES = {
@@ -36,7 +37,19 @@ settings.configure(
     DATABASES = {
         'default': DATABASES['postgresql'],
     },
+    CONTEXT_PROCESSORS=[],
+    TEMPLATES = [
+        {
+            'BACKEND': 'django.template.backends.django.DjangoTemplates',
+            'DIRS': [],
+            'APP_DIRS': True,
+            'OPTIONS': {
+                'context_processors': [],
+            }
+        },
+    ]
 )
+django.setup()
 
 
 # after we have some settings
@@ -46,7 +59,7 @@ from django.test.utils import override_settings
 def run_against(db):
     @override_settings(DATABASES = { 'default': DATABASES[db] })
     def run_tests():
-        print "Running tests against %s database." % db
+        print("Running tests against %s database." % db)
 
         #from django.test.simple import DjangoTestSuiteRunner
         #test_runner = DjangoTestSuiteRunner(verbosity=1, failfast=False)
@@ -68,10 +81,10 @@ if len(sys.argv) == 1: #pragma no cover
         rc = subprocess.call(args)
         failures += rc
     if failures != 0:
-        print "\nTOTAL FAILURES: %i" % failures
+        print("\nTOTAL FAILURES: %i" % failures)
         sys.exit(failures)
 elif len(sys.argv) == 2:
     run_against(sys.argv[1])
 else: #pragma: no cover
-    print >>sys.stderr, "Cannot run against multiple databases in one run."
+    sys.stderr.write("Cannot run against multiple databases in one run.\n")
     sys.exit(100)

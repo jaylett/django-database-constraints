@@ -5,10 +5,11 @@ from django.db import models, IntegrityError, OperationalError, connection, tran
 import django.forms
 from django.test import TransactionTestCase
 from django.test.client import RequestFactory
+from django.utils.encoding import smart_bytes, smart_text
 from django.views.generic import CreateView, UpdateView
 
-from forms import TransactionalMixin
-from views import CreateView as TransactionalCreateView, UpdateView as TransactionalUpdateView
+from .forms import TransactionalMixin
+from .views import CreateView as TransactionalCreateView, UpdateView as TransactionalUpdateView
 
 
 class TestModel(models.Model):
@@ -18,6 +19,7 @@ class TestModel(models.Model):
 class TestForm(django.forms.ModelForm):
     class Meta:
         model = TestModel
+        fields = ['unique']
 
 
 class TransactionalTestForm(TransactionalMixin, TestForm):
@@ -282,9 +284,9 @@ class TestViews(TransactionTestCase):
     def test_create_override_conversion(self):
         class _CreateView(TransactionalCreateView):
             def validationerror_from_integrityerror(self, ierror):
-                return django.forms.ValidationError("poop")
+                return django.forms.ValidationError(smart_text('poop'))
         first, second = self._test_create(TestForm, _CreateView)
-        self.assertTrue("poop" in first.response.content)
+        self.assertTrue(smart_bytes('poop') in first.response.content)
 
     def _test_create(self, base_form, create_view=TransactionalCreateView):
         self.assertEqual(0, TestModel.objects.count())
@@ -331,8 +333,8 @@ class TestViews(TransactionTestCase):
         self.assertEqual(1, TestModel.objects.count())
 
         self.assertEqual(200, first.response.status_code)
-        self.assertTrue('errorlist' in first.response.content)
-        self.assertTrue('errorlist' not in second.response.content)
+        self.assertTrue(smart_bytes('errorlist') in first.response.content)
+        self.assertTrue(smart_bytes('errorlist') not in second.response.content)
         self.assertEqual(302, second.response.status_code)
         self.assertEqual('/', second.response['Location'])
         return first, second
@@ -346,9 +348,9 @@ class TestViews(TransactionTestCase):
     def test_update_override_conversion(self):
         class _UpdateView(TransactionalUpdateView):
             def validationerror_from_integrityerror(self, ierror):
-                return django.forms.ValidationError("poop")
+                return django.forms.ValidationError(smart_text('poop'))
         first, second = self._test_update(TestForm, _UpdateView)
-        self.assertTrue("poop" in first.response.content)
+        self.assertTrue(smart_bytes('poop') in first.response.content)
 
     def _test_update(self, base_form, update_view=TransactionalUpdateView):
         self.assertEqual(0, TestModel.objects.count())
@@ -401,8 +403,8 @@ class TestViews(TransactionTestCase):
         self.assertEqual(3, tm2.unique)
 
         self.assertEqual(200, first.response.status_code)
-        self.assertTrue('errorlist' in first.response.content)
-        self.assertTrue('errorlist' not in second.response.content)
+        self.assertTrue(smart_bytes('errorlist') in first.response.content)
+        self.assertTrue(smart_bytes('errorlist') not in second.response.content)
         self.assertEqual(302, second.response.status_code)
         self.assertEqual('/', second.response['Location'])
         return first, second

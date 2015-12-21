@@ -155,7 +155,7 @@ I'd like to have a function that will auto-patch the admin, so it will be safe a
 
 ## Requirements
 
-Django 1.6, for the new transaction work.
+Django 1.8. Django 1.9 seems to have problems, but until I use it on a brand new project I'm unlikely to get to it (or pull requests welcome).
 
 A modern relational database: the test harness runs against both postgresql and mysql. sqlite3 may work, but I can't test it because it doesn't like threading (which I'm using to test concurrency).
 
