@@ -155,15 +155,15 @@ I'd like to have a function that will auto-patch the admin, so it will be safe a
 
 ## Requirements
 
-Django 1.8. Django 1.9 seems to have problems, but until I use it on a brand new project I'm unlikely to get to it (or pull requests welcome).
+Django 1.10.
 
-A modern relational database: the test harness runs against both postgresql and mysql. sqlite3 may work, but I can't test it because it doesn't like threading (which I'm using to test concurrency).
+A modern relational database: the test harness runs against both postgresql and mysql. sqlite3 may work, but I can't test it because it doesn't like threading (which I'm using to test concurrency). Note that I haven't tested on mysql with Django 1.10, although it worked fine on 1.8 and so should still be okay.
 
 ## Developing
 
 You want the following to be able to work on the code and run the tests:
 
-    $ pip install Django>=1.6.0 coverage psycopg2 MySQL-python
+    $ pip install Django>=1.10.0 coverage psycopg2 MySQL-python
 
 Note that if you use the official distributions of MySQL on Mac OS you want to run this with `PATH=$PATH:/usr/local/mysql/bin` and run `make coverage` with `DYLD_LIBRARY_PATH=/usr/local/mysql/lib`. (Use `Postgresql.app` for convenience.)
 
